@@ -24,3 +24,27 @@ I created this script to automate a lot of steps I found myself doing manually e
 3. Update any other settings as necessary or desired in export_config.xml
 4. Ensure your project has a version set in project.godot (or not if you don't want to use that functionality)
 5. Execute export.ps1 from your Godot project root directory
+
+## Example directory structure
+
+For the default config exports, and default configuration options.
+The zip files contain exactly the same contents as the corresponding directories.
+Assuming project is "My Cool Game" with version "0.0.1":
+
+```
+My Cool Game
++-- exports
+   +-- My Cool Game v0.0.1
+      +-- My Cool Game v0.0.1 - Windows Desktop.zip
+      +-- My Cool Game v0.0.1 - Web.zip
+      +-- Windows Desktop
+         +-- My Cool Game v0.0.1.exe
+         +-- My Cool Game v0.0.1.pck
+      +-- Web
+         +-- index.html
+         +-- index.js
+         +-- index.pck
+         +-- etc. ...
+```
+
+
