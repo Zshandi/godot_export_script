@@ -27,9 +27,8 @@ I created this script to automate a lot of steps I found myself doing manually e
 
 ## Example directory structure
 
-For the default config exports, and default configuration options.
 The zip files contain exactly the same contents as the corresponding directories.
-Assuming project is "My Cool Game" with version "0.0.1":
+Assuming project is "My Cool Game" with version "0.0.1", and using the default export_config.xml:
 
 ```
 My Cool Game
