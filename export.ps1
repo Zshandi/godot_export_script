@@ -18,8 +18,6 @@ $version_prefix = $config.version_prefix
 
 $git_main_branch = $config.git_main_branch
 
-$exports_base_dir = $config.exports_base_dir
-
 $godot_command = $config.godot_command
 $additional_command_args = $config.additional_args
 
@@ -88,28 +86,56 @@ else
     $version_string = ""
 }
 
+#====  FOR USE IN CONFIGURABLE VERSIONED FILES  ====#
+$project_and_version = "$project_name$version_string"
+function ReplaceValues {
+    param (
+        [string]
+        $Val
+    )
+    
+    $Val = $Val -replace "\[project_and_version\]", "$project_name$version_string"
+    $Val = $Val -replace "\[project\]", "$project_name"
+    $Val = $Val -replace "\[version\]", "$version_string"
+    return $Val
+}
+
 #====  CREATE BASE DIRECTORIES  ====#
 
-$export_versioned_dir = "$exports_base_dir\$project_name$version_string"
+$exports_base_dir = ReplaceValues $config.exports_base_dir
 
-New-Item -Path $export_versioned_dir -ItemType Directory
+New-Item -Path $exports_base_dir -ItemType Directory
 
 
-#====  EXPORT TEAMPLATES FROM CONFIG  ====#
+#====  EXPORT TEMPLATES FROM CONFIG  ====#
 
 foreach ($export in $exports)
 {
     $export_name = $export.name
 
-    $project_and_version = "$project_name$version_string"
+    # Get zip file name (if blank use default)
+    $zip_file_no_extension = "[project_and_version]_$export_name"
 
-    $export_file_name = "$project_and_version - $export_name"
+    if ($export.zip_file_name)
+    {
+        $zip_file_no_extension = $export.zip_file_name
+    }
+    $zip_file_no_extension = ReplaceValues $zip_file_no_extension
 
-    $export_zip_file = "$export_file_name.zip"
+    $export_zip_file = "$zip_file_no_extension.zip"
 
-    $export_file_name = $export.file_name -replace "\[project_and_version\]", "$project_and_version"
+    # Get export file name (if blank use default)
+    $export_file_name = "$[project_and_version]_$export_name"
 
-    $export_path = "$export_versioned_dir\$export_name"
+    if ($export.file_name)
+    {
+        $export_file_name = $export.file_name
+    }
+
+    $export_file_name = ReplaceValues $export_file_name
+
+
+    $export_path = "$exports_base_dir\$export_name"
     $export_file_path = "$export_path\$export_file_name"
 
     $export_switch = "--export-release"
@@ -126,6 +152,6 @@ foreach ($export in $exports)
     Write-Host "> $godot_command $cmd_args"
     Start-Process -Wait "$godot_command" "$cmd_args"
     
-    Write-Host "Compressing contents of '$export_path\' to '$export_versioned_dir\$export_zip_file'" -ForegroundColor Green
-    Compress-Archive "$export_path\*" -DestinationPath "$export_versioned_dir\$export_zip_file"
+    Write-Host "Compressing contents of '$export_path\' to '$exports_base_dir\$export_zip_file'" -ForegroundColor Green
+    Compress-Archive "$export_path\*" -DestinationPath "$exports_base_dir\$export_zip_file"
 }
